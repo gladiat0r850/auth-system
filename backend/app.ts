@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
+const env = require("dotenv").config()
 app.use(cookieParser())
 app.use(express.json())
 app.use(cors({
@@ -55,7 +56,7 @@ app.post('/log-in/:id', async (req: Request, res: Response) => {
         const userExists: IUser = await model.findOne({email})
         const passwordIsEqual = await bcrypt.compare(password, userExists.password)
 
-        const token = jwt.sign({id: userExists.id, email: userExists.email}, "blablabla", {expiresIn: '1h'})
+        const token = jwt.sign({id: userExists.id, email: userExists.email}, process.env.JWT_TOKEN, {expiresIn: '1h'})
 
         res.cookie("token", token, {
             httpOnly: true,
@@ -115,8 +116,8 @@ app.delete('/delete-account', async (req: Request, res: Response) => {
     }
 })
 
-app.listen(5000, (error: Error) => {
+app.listen(process.env.PORT, (error: Error) => {
     if(error) throw new Error()
-    console.log(`listening to 5000`)
+    console.log(`listening to ${process.env.PORT}`)
 })
 
